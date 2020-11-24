@@ -1,3 +1,5 @@
+/* Copyright Pernosco 2020. See LICENSE. */
+
 const DOMREC_ADD = "a";
 const DOMREC_CANVAS_DATA = "c";
 const DOMREC_DELAY = "d";
