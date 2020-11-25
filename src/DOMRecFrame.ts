@@ -126,6 +126,40 @@ export class DOMRecFrame {
     }
   };
 
+  public stop(): void {
+    this.flushObserver();
+    this.observer.disconnect();
+    this.win.removeEventListener('input', this.inputListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.win.removeEventListener('mousemove', this.mouseListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.win.removeEventListener('mousedown', this.mouseListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.win.removeEventListener('mouseup', this.mouseListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.win.removeEventListener('forceStyleFlush' as any, this.flushListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.win.removeEventListener('didDrawCanvas' as any, this.canvasListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.win.removeEventListener('focus', this.focusListener, {
+      capture: true,
+      passive: true
+    } as any);
+    this.rec.deleteAllDOMRecIDs(this.node);
+  }
+
   public canvasListener = (event): void => {
     if (!this.node.contains(event.target)) {
       return;
