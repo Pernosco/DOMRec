@@ -1,179 +1,26 @@
 /* Copyright Pernosco 2020. See LICENSE. */
 
-const DOMREC_ADD = 'a';
-const DOMREC_CANVAS_DATA = 'c';
-const DOMREC_DELAY = 'd';
-const DOMREC_FRAME = 'e';
-const DOMREC_FORCE_STYLE_FLUSH = 'f';
-const DOMREC_INPUT = 'i';
-const DOMREC_LABEL = 'l';
-const DOMREC_MOUSE_MOVE = 'm';
-const DOMREC_MOUSE_DOWN = 'n';
-const DOMREC_ATTR = 'r';
-const DOMREC_TEXT = 't';
-const DOMREC_MOUSE_UP = 'u';
-const DOMREC_REMOVE = 'v';
-const DOMREC_SCROLL = 's';
+import { DOMRecFrame } from './DOMRecFrame';
+import {
+  DOMREC_ADD,
+  DOMREC_CANVAS_DATA,
+  DOMREC_DELAY,
+  DOMREC_FRAME,
+  DOMREC_FORCE_STYLE_FLUSH,
+  DOMREC_INPUT,
+  DOMREC_LABEL,
+  DOMREC_MOUSE_MOVE,
+  DOMREC_MOUSE_DOWN,
+  DOMREC_ATTR,
+  DOMREC_TEXT,
+  DOMREC_MOUSE_UP,
+  DOMREC_REMOVE,
+  DOMREC_SCROLL
+} from './constants';
 
 const DOMREC_SKIP_HIDDEN_IDS = ['toolbox'];
 
 (window as any).DOMREC_SKIP_HIDDEN_IDS = DOMREC_SKIP_HIDDEN_IDS;
-
-function DOMRecFrame(win, node, rec, iframeElement): void {
-  this.win = win;
-  this.node = node;
-  this.rec = rec;
-  this.iframeElement = iframeElement;
-  node.ownerDocument.DOMRecInner = this;
-
-  const prepEvent = (event): number => {
-    this.flushObserver();
-    if ('DOMRecID' in event.target) {
-      return event.target.DOMRecID;
-    }
-    return 0;
-  };
-
-  this.inputListener = (event): void => {
-    if (!this.node.contains(event.target)) {
-      return;
-    }
-    const id = prepEvent(event);
-    if (id) {
-      const a = {};
-      let value = null;
-      // For contenteditable elements, the DOM changes will just
-      // be recorded and we don't have to do anything here except
-      // record an input event so the caret can be updated.
-      if ('value' in event.target) {
-        value = event.target.value;
-      }
-      // eslint-disable-next-line no-console
-      console.log(value, 'just in order to have tsc tolerating the unused variable for now');
-      a[DOMREC_INPUT] = [id, event.target.value];
-      this.rec.actions.push(a);
-    }
-  };
-  this.mouseListener = (event): void | never => {
-    let x = event.clientX;
-    let y = event.clientY;
-    let frameElem = this.iframeElement;
-    let target = event.target;
-    let mouseEventNode = this.node;
-    // Translate to root document coordinates.
-    while (frameElem) {
-      const frameRect = frameElem.getBoundingClientRect();
-      // XXX assumes no border/padding on the IFRAME. handling that is a pain.
-      x += frameRect.left;
-      y += frameRect.top;
-      target = frameElem;
-      const nextInner = frameElem.ownerDocument.DOMRecInner;
-      mouseEventNode = nextInner.node;
-      frameElem = nextInner.iframeElement;
-    }
-    if (!mouseEventNode.contains(target)) {
-      return;
-    }
-    this.flushObserver();
-    const nodeRect = mouseEventNode.getBoundingClientRect();
-    x -= nodeRect.left;
-    y -= nodeRect.top;
-    let key;
-    switch (event.type) {
-      case 'mousemove':
-        key = DOMREC_MOUSE_MOVE;
-        break;
-      case 'mouseup':
-        key = DOMREC_MOUSE_UP;
-        break;
-      case 'mousedown':
-        key = DOMREC_MOUSE_DOWN;
-        break;
-      default:
-        throw new Error(`Unknown event type: ${event.type}`);
-    }
-    const a = {};
-    a[key] = [Math.round(x), Math.round(y)];
-    this.rec.actions.push(a);
-  };
-  this.flushListener = (event): void => {
-    if (!this.node.contains(event.target)) {
-      return;
-    }
-    const id = prepEvent(event);
-    if (id) {
-      const a = {};
-      a[DOMREC_FORCE_STYLE_FLUSH] = id;
-      this.rec.actions.push(a);
-    }
-  };
-  this.canvasListener = (event): void => {
-    if (!this.node.contains(event.target)) {
-      return;
-    }
-    const id = prepEvent(event);
-    if (id) {
-      const a = {};
-      a[DOMREC_CANVAS_DATA] = [id, event.target.toDataURL(), 'didDraw'];
-      this.rec.actions.push(a);
-    }
-  };
-  this.focusListener = (): void => rec.evaluateFocus();
-  this.scrollListener = (event): void => {
-    if (!this.node.contains(event.target)) {
-      return;
-    }
-    const id = prepEvent(event);
-    if (id) {
-      this.rec.pushScrollAction(id, event.target);
-    }
-  };
-
-  const actions = [];
-  const serializedNode = rec.serializeNode(node, actions);
-  if (!serializedNode) {
-    throw new Error(`Can't record element ${node.tagName}`);
-  }
-  this.initialState = [serializedNode, actions];
-  this.observer = new MutationObserver(rec.observerCallback);
-  this.observer.observe(node, {
-    attributes: true,
-    characterData: true,
-    childList: true,
-    subtree: true
-  });
-
-  win.addEventListener('input', this.inputListener, { capture: true, passive: true });
-  win.addEventListener('mousemove', this.mouseListener, { capture: true, passive: true });
-  win.addEventListener('mousedown', this.mouseListener, { capture: true, passive: true });
-  win.addEventListener('mouseup', this.mouseListener, { capture: true, passive: true });
-  win.addEventListener('forceStyleFlush', this.flushListener, { capture: true, passive: true });
-  win.addEventListener('didDrawCanvas', this.canvasListener, { capture: true, passive: true });
-  win.addEventListener('focus', this.focusListener, { capture: true, passive: true });
-}
-
-DOMRecFrame.prototype.flushObserver = function (): void {
-  this.rec.observerCallback(this.observer.takeRecords());
-};
-
-DOMRecFrame.prototype.stop = function (): void {
-  this.flushObserver();
-  this.observer.disconnect();
-  this.win.removeEventListener('input', this.inputListener, { capture: true, passive: true });
-  this.win.removeEventListener('mousemove', this.mouseListener, { capture: true, passive: true });
-  this.win.removeEventListener('mousedown', this.mouseListener, { capture: true, passive: true });
-  this.win.removeEventListener('mouseup', this.mouseListener, { capture: true, passive: true });
-  this.win.removeEventListener('forceStyleFlush', this.flushListener, {
-    capture: true,
-    passive: true
-  });
-  this.win.removeEventListener('didDrawCanvas', this.canvasListener, {
-    capture: true,
-    passive: true
-  });
-  this.win.removeEventListener('focus', this.focusListener, { capture: true, passive: true });
-  this.rec.deleteAllDOMRecIDs(this.node);
-};
 
 function DOMRec(node): void {
   this.nextID = 1;
