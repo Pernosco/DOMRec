@@ -1,0 +1,40 @@
+{
+  "name": "domrec",
+  "version": "1.0.0",
+  "description": "DOMRec records and replays DOM updates to make lightweight, pixel-perfect screenshots and movies. Perfect for Web application demos.",
+  "main": "dist/domrec.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf dist/* && tsc --project tsconfig.json",
+    "lint": "eslint src/**/*.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pernosco/DOMRec.git"
+  },
+  "author": "rocallahan <https://github.com/rocallahan>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Pernosco/DOMRec/issues"
+  },
+  "homepage": "https://github.com/Pernosco/DOMRec#readme",
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@types/babel__core": "^7.1.12",
+    "@types/eslint": "^7.2.5",
+    "@types/eslint-plugin-prettier": "^3.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/eslint-plugin-tslint": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
+    "codelyzer": "^6.0.1",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsdoc": "^30.7.8",
+    "prettier": "^2.2.0",
+    "tslib": "^2.0.3",
+    "tslint": "^6.1.3",
+    "typescript": "^4.1.2"
+  }
+}
