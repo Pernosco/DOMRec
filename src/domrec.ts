@@ -26,15 +26,15 @@ function DOMRecFrame(win, node, rec, iframeElement): void {
   this.iframeElement = iframeElement;
   node.ownerDocument.DOMRecInner = this;
 
-  const prepEvent = function (event): number {
+  const prepEvent = (event): number => {
     this.flushObserver();
     if ('DOMRecID' in event.target) {
       return event.target.DOMRecID;
     }
     return 0;
-  }.bind(this);
+  };
 
-  this.inputListener = function (event): void {
+  this.inputListener = (event): void => {
     if (!this.node.contains(event.target)) {
       return;
     }
@@ -53,8 +53,8 @@ function DOMRecFrame(win, node, rec, iframeElement): void {
       a[DOMREC_INPUT] = [id, event.target.value];
       this.rec.actions.push(a);
     }
-  }.bind(this);
-  this.mouseListener = function (event): void | never {
+  };
+  this.mouseListener = (event): void | never => {
     let x = event.clientX;
     let y = event.clientY;
     let frameElem = this.iframeElement;
@@ -95,8 +95,8 @@ function DOMRecFrame(win, node, rec, iframeElement): void {
     const a = {};
     a[key] = [Math.round(x), Math.round(y)];
     this.rec.actions.push(a);
-  }.bind(this);
-  this.flushListener = function (event): void {
+  };
+  this.flushListener = (event): void => {
     if (!this.node.contains(event.target)) {
       return;
     }
@@ -106,8 +106,8 @@ function DOMRecFrame(win, node, rec, iframeElement): void {
       a[DOMREC_FORCE_STYLE_FLUSH] = id;
       this.rec.actions.push(a);
     }
-  }.bind(this);
-  this.canvasListener = function (event): void {
+  };
+  this.canvasListener = (event): void => {
     if (!this.node.contains(event.target)) {
       return;
     }
@@ -117,9 +117,9 @@ function DOMRecFrame(win, node, rec, iframeElement): void {
       a[DOMREC_CANVAS_DATA] = [id, event.target.toDataURL(), 'didDraw'];
       this.rec.actions.push(a);
     }
-  }.bind(this);
+  };
   this.focusListener = (): void => rec.evaluateFocus();
-  this.scrollListener = function (event): void {
+  this.scrollListener = (event): void => {
     if (!this.node.contains(event.target)) {
       return;
     }
@@ -127,7 +127,7 @@ function DOMRecFrame(win, node, rec, iframeElement): void {
     if (id) {
       this.rec.pushScrollAction(id, event.target);
     }
-  }.bind(this);
+  };
 
   const actions = [];
   const serializedNode = rec.serializeNode(node, actions);
