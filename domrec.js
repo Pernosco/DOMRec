@@ -21,6 +21,7 @@ const DOMREC_SCROLL = "s";
 window.DOMREC_SKIP_HIDDEN_IDS = ['toolbox'];
 
 // XXX Currently we assume all scrollable elements are one of PRE/DIV/INPUT/TEXTAREA
+// XXX we don't support :hover at all.
 
 function DOMRecFrame(win, node, rec, iframeElement) {
   this.win = win;
@@ -1002,7 +1003,7 @@ const DOMREC_REPLAY_FRAME_STYLESHEETS = {
 // XXX this assumes a fixed list of stylesheets will do for all the replays that
 // use this script!
 const DOMREC_REPLAY_STYLESHEETS = [
-    "https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800,600",
+    "domrec-replay.css",
 ];
 // Full URL of the current script
 let DOMRecScriptURL = document.currentScript ? document.currentScript.src : null;
@@ -1010,6 +1011,7 @@ let DOMRecScriptURL = document.currentScript ? document.currentScript.src : null
 // This function gets called to rewrite all the stylesheet URLs during replay.
 // This can apply dynamic changes e.g. using DOMRecScriptURL.
 function rewriteResourceURL(url) {
+  return url;
 }
 
 function DOMSetupReplay(element) {
