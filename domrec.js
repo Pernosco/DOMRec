@@ -15,7 +15,12 @@ const DOMREC_MOUSE_UP = "u";
 const DOMREC_REMOVE = "v";
 const DOMREC_SCROLL = "s";
 
+// If an element has the "hidden" class and its ID is in this list,
+// assume it won't be needed for the replay and just ignore the node
+// completely.
 window.DOMREC_SKIP_HIDDEN_IDS = ['toolbox'];
+
+// XXX Currently we assume all scrollable elements are one of PRE/DIV/INPUT/TEXTAREA
 
 function DOMRecFrame(win, node, rec, iframeElement) {
   this.win = win;
@@ -298,7 +303,6 @@ DOMRec.prototype.serializeNode = function(node, actions) {
             delete node.DOMRecID;
             return null;
           }
-          // In Pernosco all scrollable elements happen to be DIV/INPUT/TEXTAREA
           let listener = node.ownerDocument.DOMRecInner.scrollListener;
           node.addEventListener("scroll", listener, {passive:true});
           break;
