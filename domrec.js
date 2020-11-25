@@ -134,7 +134,9 @@ function DOMRecFrame(win, node, rec, iframeElement) {
   win.addEventListener("mousemove", this.mouseListener, {capture:true, passive:true});
   win.addEventListener("mousedown", this.mouseListener, {capture:true, passive:true});
   win.addEventListener("mouseup", this.mouseListener, {capture:true, passive:true});
+  // Dispatch this event on an element when you want to flush styles on it and its descendants.
   win.addEventListener("forceStyleFlush", this.flushListener, {capture:true, passive:true});
+  // Dispatch this event on a canvas element when you've drawn into it.
   win.addEventListener("didDrawCanvas", this.canvasListener, {capture:true, passive:true});
   win.addEventListener("focus", this.focusListener, {capture:true, passive:true});
 }
@@ -984,32 +986,26 @@ DOMReplay.prototype.play = function(options) {
   doPlay();
 }
 
-// List URLs explicitly here so use_content_hashes can
-// rewrite them to point to content-hashes.
+// For subframe external stylesheets, replay loads the stylesheet text and inject the
+// text directly into the subframe.
+// The key here is the stylesheet URL in the recorded document's LINK
+// element, the value is the URL from which we should fetch its text during replay.
 const DOMREC_REPLAY_FRAME_STYLESHEETS = {
-  'source-viewer.css': "/client/source-viewer.css?1",
-  'editor.main.css': "/client/monaco-editor/min/vs/editor/editor.main.css?1",
-  'pml.css': "/client/pml.css?1",
 };
+// These stylesheets will be loaded in the main replay frame. We don't try to load
+// the original stylesheets from the recording at all; instead list their replay-time
+// URLs here.
+// XXX this assumes a fixed list of stylesheets will do for all the replays that
+// use this script!
 const DOMREC_REPLAY_STYLESHEETS = [
-  "/client/main.css",
-  "/client/pml.css",
-  "/client/domrec-replay.css",
+    "https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800,600",
 ];
 // Full URL of the current script
 let DOMRecScriptURL = document.currentScript ? document.currentScript.src : null;
 
+// This function gets called to rewrite all the stylesheet URLs during replay.
+// This can apply dynamic changes e.g. using DOMRecScriptURL.
 function rewriteResourceURL(url) {
-  if (url.startsWith("https://")) {
-    // URL was rewritten by use_content_hashes already. Just use it.
-    return url;
-  }
-  // This script is under js/domrec.js, so trim that off and append the URL
-  // (after trimming /client)
-  if (!DOMRecScriptURL.endsWith("/js/domrec.js")) {
-    throw "Invalid script URL " + DOMRecScriptURL;
-  }
-  return DOMRecScriptURL.substring(0, DOMRecScriptURL.length - 13) + url.substring(7);
 }
 
 function DOMSetupReplay(element) {
@@ -1024,7 +1020,6 @@ function DOMSetupReplay(element) {
     sheet = rewriteResourceURL(sheet);
     srcdoc += '<link rel="stylesheet" href="' + sheet + '">';
   }
-  srcdoc += '<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800,600" rel="stylesheet"></head>';
   frame.srcdoc = srcdoc;
   // Crazy hack to get the correct size for the IFRAME. We insert an SVG element
   // with the correct aspect ratio and let its intrinsic height be the height of our
