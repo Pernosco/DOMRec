@@ -1,0 +1,59 @@
+html {
+  overflow: hidden;
+}
+html > body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  margin: 0;
+}
+#main {
+  margin: 0;
+}
+
+.mouseCursor {
+  position: absolute;
+  z-index: 1000;
+  height: 32px;
+}
+.mouseCursor > svg {
+  height: 100%;
+}
+.mouseCursor::before {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  z-index: -1;
+  content: '';
+  background: radial-gradient(circle closest-side, blue, rgba(0,0,255,0));
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.mouseCursor.down::before {
+  opacity: 1;
+  transition: opacity 0.01s;
+}
+
+.fakeInput {
+  position: absolute;
+  box-sizing: border-box;
+}
+.fakeInput > span {
+  display: inline-block;
+}
+.fakeCaret {
+  display: block;
+  position: absolute;
+  background: black;
+  width: 2px;
+}
+.baselineMeasurer {
+  display: inline-block;
+  width: 0;
+  height: 0;
+}

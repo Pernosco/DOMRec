@@ -1,0 +1,94 @@
+.DOMRecScreenshot, .DOMRecMovie {
+  position: relative;
+  max-width: 100%;
+}
+.DOMRecMovie > div {
+  position: absolute;
+  left: calc(50% - 100px);
+  top: calc(50% - 50px);
+  width: 200px;
+  font-size: 100px;
+  color: black;
+  text-shadow: 0 0 10px white, 0 0 10px white;
+  opacity: 0;
+  text-align: center;
+  transition: opacity 1s;
+}
+.DOMRecMovie > div::before {
+  content: "⟲";
+}
+.DOMRecMovie.looping > div {
+  opacity: 1;
+  transition: none;
+}
+.DOMRecMovie:fullscreen, .DOMRecScreenshot:fullscreen {
+  background: black;
+}
+.DOMRecMovie[popOut]:not(.poppedOut):not(:fullscreen) > button, .DOMRecScreenshot[popOut]:not(.poppedOut):not(:fullscreen) > button {
+  display: none;
+}
+.DOMRecMovie[popOut]:not(.poppedOut):not(:-webkit-full-screen) > button, .DOMRecScreenshot[popOut]:not(.poppedOut):not(:-webkit-full-screen) > button {
+  display: none;
+}
+.DOMRecMovie > button, .DOMRecScreenshot > button {
+  position: absolute;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+.DOMRecMovie.playing > button {
+  opacity: 0;
+}
+.DOMRecMovie > button.play {
+  left: calc(50% - 160px);
+  top: calc(50% - 50px);
+  width: 200px;
+  height: 100px;
+  padding-bottom: 10px;
+  font-size: 60px;
+}
+.DOMRecMovie > button.play::before {
+  content: "▶";
+}
+.DOMRecMovie > button.fullscreen, .DOMRecScreenshot > button.fullscreen {
+  left: calc(50% + 60px);
+  top: calc(50% - 25px);
+  width: 100px;
+  height: 50px;
+  padding-bottom: 5px;
+  font-size: 30px;
+}
+.DOMRecScreenshot:not(:hover) > button, .DOMRecScreenshot:fullscreen > button, .DOMRecMovie:not(:hover) > button, .DOMRecMovie:fullscreen > button {
+  opacity: 0;
+  pointer-events: none;
+}
+.DOMRecScreenshot > button.fullscreen {
+  left: calc(50% - 50px);
+  top: calc(50% - 25px);
+}
+.DOMRecMovie > button.fullscreen::before, .DOMRecScreenshot > button.fullscreen::before {
+  content: "⛶";
+}
+.DOMRecScreenshot > svg, .DOMRecMovie > svg {
+  pointer-events: none;
+  display: block;
+}
+.DOMRecScreenshot > iframe, .DOMRecMovie > iframe {
+  border: none;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+}
+/* UGH WEBKIT */
+.DOMRecScreenshot:not(:fullscreen) > iframe, .DOMRecMovie:not(:fullscreen) > iframe {
+  left: -2px !important;
+  top: -2px !important;
+  width: calc(4px + 100%) !important;
+  height: calc(4px + 100%) !important;
+}
+/* UGH WEBKIT */
+.DOMRecScreenshot:not(:-webkit-full-screen) > iframe, .DOMRecMovie:not(:-webkit-full-screen) > iframe {
+  left: -2px !important;
+  top: -2px !important;
+  width: calc(4px + 100%) !important;
+  height: calc(4px + 100%) !important;
+}
