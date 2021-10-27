@@ -57,3 +57,10 @@ html > body {
   width: 0;
   height: 0;
 }
+.domrecRoot {
+  /* If we recorded less than the complete document, what we recorded may have
+   * had fixed positioning within said document. But we don't want it to
+   * have fixed positioning here.
+   */
+  position: unset !important;
+}

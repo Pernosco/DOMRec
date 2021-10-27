@@ -38,6 +38,9 @@ function DOMRecFrame(win, node, rec, iframeElement) {
     return 0;
   }).bind(this);
 
+  if (!this.iframeElement) {
+    this.node.classList.add("domrecRoot");
+  }
   this.inputListener = (function(event) {
       if (!this.node.contains(event.target)) {
         return;
@@ -162,6 +165,9 @@ DOMRecFrame.prototype.stop = function() {
   this.win.removeEventListener("didDrawCanvas", this.canvasListener, {capture:true, passive:true});
   this.win.removeEventListener("focus", this.focusListener, {capture:true, passive:true});
   this.rec.deleteAllDOMRecIDs(this.node);
+  if (!this.iframeElement) {
+    this.node.classList.remove("domrecRoot");
+  }
 }
 
 function DOMRec(node) {
